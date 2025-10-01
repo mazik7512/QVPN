@@ -1,0 +1,111 @@
+cmake_minimum_required(VERSION 4.1)  # Минимальная версия проекта
+
+
+# Project
+set(PROJECT_NAME "QVPN Collection")
+project(${PROJECT_NAME}   
+	VERSION 0.5
+	DESCRIPTION "QVPN Project"
+	LANGUAGES CXX
+)
+
+
+# Build options
+option(QVPN_BUILD_TEST "Build QVPN tests" OFF)
+
+option(QVPN_BUILD_CLIENT "Build QVPN client app only" OFF)
+option(QVPN_BUILD_SERVER "Build QVPN server app only" OFF)
+option(QVPN_BUILD_LIB "Build QVPN library only" OFF)
+option(QVPN_BUILD_ALL "Build QVPN (client and server) apps and lib" ON)
+
+
+# Settings
+
+set(CMAKE_MODULE_PATH "${CMAKE_CURRENT_SOURCE_DIR}/include")
+
+# C++
+set(CMAKE_CXX_STANDARD 20)
+set(CMAKE_CXX_STANDARD_REQUIRED ON)
+
+# CMake dirs
+set(CMAKE_ARCHIVE_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/lib) 
+set(CMAKE_LIBRARY_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/lib)
+set(CMAKE_RUNTIME_OUTPUT_DIRECTORY_RELEASE ${CMAKE_BINARY_DIR}/bin)
+set(CMAKE_RUNTIME_OUTPUT_DIRECTORY_DEBUG ${CMAKE_RUNTIME_OUTPUT_DIRECTORY_RELEASE})
+
+
+# QVPN Names
+set(QVPN_LIBRARY "QVPN Lib")
+set(QVPN_SERVER_APP "QVPN Server App")
+set(QVPN_CLIENT_APP "QVPN Client App")
+
+set(QVPN_LIBRARY_NAME "QVPN_Lib")
+set(QVPN_SERVER_APP_NAME "QVPN_Server_App")
+set(QVPN_CLIENT_APP_NAME "QVPN_Client_App")
+
+
+# QVPN Data
+set(QVPN_LIBRARY_PATH "QVPN/${QVPN_LIBRARY}")
+set(QVPN_SERVER_APP_PATH "QVPN/${QVPN_SERVER_APP}")
+set(QVPN_CLIENT_APP_PATH "QVPN/${QVPN_CLIENT_APP}")
+
+
+# Includes
+set(PROJ_INCLUDE "${CMAKE_CURRENT_SOURCE_DIR}/QVPN/${QVPN_LIBRARY}/include")
+include_directories(${PROJ_INCLUDE})
+
+
+# Project Dirs
+add_subdirectory("${QVPN_LIBRARY_PATH}")
+add_subdirectory("${QVPN_SERVER_APP_PATH}")
+add_subdirectory("${QVPN_CLIENT_APP_PATH}")
+
+
+#Lib files
+file(GLOB_RECURSE lib_src "${QVPN_LIBRARY_PATH}/*.cpp")
+file(GLOB_RECURSE lib_incl "${QVPN_LIBRARY_PATH}/*.hpp")
+
+
+# External libs
+
+# Ручное подключение Npcap
+
+set(NPCAP_PATH "${CMAKE_CURRENT_SOURCE_DIR}/include/npcap") # ваш путь
+add_definitions(-DNPCAP=ON)
+include_directories(${NPCAP_PATH}/Include)
+link_directories(${NPCAP_PATH}/Lib/x64)
+
+
+# Подключение WinTun
+set(WINTUN_PATH "${CMAKE_CURRENT_SOURCE_DIR}/include/wintun")
+include_directories(${WINTUN_PATH}/include)
+link_directories(${WINTUN_PATH}/bin/amd64)
+
+#find_package(PCAP REQUIRED)  # не работает
+#include(FINDPCAP.cmake)  # аналогично
+
+# Libs
+add_library(${QVPN_LIBRARY_NAME} STATIC ${lib_incl} ${lib_src})
+target_link_libraries(${QVPN_LIBRARY_NAME} PRIVATE ${PCAP_LIBRARY})
+
+# Executables
+if(QVPN_BUILD_SERVER OR QVPN_BUILD_ALL)
+	message("QVPN Server App is building...")
+	file(GLOB_RECURSE server_src "${QVPN_SERVER_APP_PATH}/src/*.cpp")
+	add_executable("${QVPN_SERVER_APP_NAME}" ${server_src})
+	target_link_libraries(${QVPN_SERVER_APP_NAME} PRIVATE ${QVPN_LIBRARY_NAME})
+endif()
+
+
+if(QVPN_BUILD_CLIENT OR QVPN_BUILD_ALL)
+	message("QVPN Client App is building...")
+	file(GLOB_RECURSE client_src "${QVPN_CLIENT_APP_PATH}/src/*.cpp")
+	add_executable("${QVPN_CLIENT_APP_NAME}" ${client_src})
+	target_link_libraries(${QVPN_CLIENT_APP_NAME} PRIVATE ${QVPN_LIBRARY_NAME})
+endif()
+
+
+
+
+
+
