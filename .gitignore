@@ -4,3 +4,7 @@ pcap-adapter-structure.png
 Hints.txt
 .vs
 *.html
+*\*.html
+*\*\*.html
+*\*\*\*.html
+*\*\*\*\*.html
