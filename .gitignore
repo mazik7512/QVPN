@@ -3,3 +3,4 @@ build
 pcap-adapter-structure.png
 Hints.txt
 .vs
+*.html
