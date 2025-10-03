@@ -27,11 +27,20 @@ namespace QVPN
 
         public:
 
+            inline void create_adapter()
+            {
+                driver_.create_adapter_impl();
+            }
+
             inline std::unique_ptr<QVPN::Core::DataStructures::AdapterList> get_adapters_list() const
             {
                 return driver_.get_adapters_list_impl();
             }
 
+            inline void capture_adapter()
+            {
+                driver_.capture_adapter_impl();
+            }
 
             inline void capture_adapter(std::string_view adapter)
             {

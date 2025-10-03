@@ -15,7 +15,7 @@ QVPN::Core::DataStructures::Adapter::Adapter()
 QVPN::Core::DataStructures::Adapter::Adapter(const Byte* begin, const Byte* end)
 	: QVPN::Core::DataStructures::Adapter::Adapter()
 {
-
+	PhysAdress.insert(PhysAdress.cend(), begin, end);
 }
 
 QVPN::Core::DataStructures::Adapter::Adapter(std::string_view a_name, std::string_view a_desc, std::string_view a_fname)

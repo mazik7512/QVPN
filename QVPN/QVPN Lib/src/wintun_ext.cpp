@@ -1,5 +1,5 @@
 #include "wintun_ext.hpp"
-
+#include <iostream>
 
 
 static WINTUN_CREATE_ADAPTER_FUNC* WintunCreateAdapter;
@@ -25,11 +25,24 @@ QVPN::WinTunExt::WinTunDriver::WinTunDriver()
 
 QVPN::WinTunExt::WinTunDriver::~WinTunDriver()
 {
+    WintunEndSession(session_);
 }
 
-std::unique_ptr<QVPN::Core::DataStructures::Adapter> QVPN::WinTunExt::WinTunDriver::create_adapter_impl()
+void QVPN::WinTunExt::WinTunDriver::create_adapter_impl()
 {
-    return std::unique_ptr<QVPN::Core::DataStructures::Adapter>();
+    GUID ExampleGuid = { 0xdeadbabe, 0xcafe, 0xbeef, { 0x01, 0x23, 0x45, 0x67, 0x89, 0xab, 0xcd, 0xef } };
+    int try_numbers = 20;
+    bool trying = true;
+    while (trying && try_numbers-- > 0)
+    {
+        adapter_ = WintunCreateAdapter(L"QVPN Adapter", L"QVPN", &ExampleGuid);
+        if (!adapter_) {
+            auto LastError = GetLastError();
+            std::cout << "Error while creating adapter. Error ¹" << LastError << std::endl;
+            continue;
+        }
+        trying = false;
+    }
 }
 
 void QVPN::WinTunExt::WinTunDriver::capture_main_adapter_impl()
@@ -87,8 +100,14 @@ void QVPN::WinTunExt::WinTunDriver::init_wintun()
     wintun_ = Wintun;
 }
 
+void QVPN::WinTunExt::WinTunDriver::capture_adapter_impl()
+{
+    session_ = WintunStartSession(adapter_, 0x400000);
+}
+
 void QVPN::WinTunExt::WinTunDriver::capture_adapter_impl(std::string_view adapter)
 {
+    
 }
 
 void QVPN::WinTunExt::WinTunDriver::capture_adapter_impl(QVPN::Core::DataStructures::Adapter& adapter)

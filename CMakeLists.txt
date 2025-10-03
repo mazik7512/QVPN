@@ -86,7 +86,8 @@ link_directories(${WINTUN_PATH}/bin/amd64)
 
 # Libs
 add_library(${QVPN_LIBRARY_NAME} STATIC ${lib_incl} ${lib_src})
-target_link_libraries(${QVPN_LIBRARY_NAME} PRIVATE ${PCAP_LIBRARY})
+#target_link_libraries(${QVPN_LIBRARY_NAME} PRIVATE ${PCAP_LIBRARY})
+#target_link_libraries(${QVPN_CLIENT_APP} PRIVATE ${})
 
 # Executables
 if(QVPN_BUILD_SERVER OR QVPN_BUILD_ALL)
@@ -105,7 +106,21 @@ if(QVPN_BUILD_CLIENT OR QVPN_BUILD_ALL)
 endif()
 
 
+# Предположим, ваша библиотека находится здесь
+set(WINTUN_DLL_PATH "${CMAKE_CURRENT_SOURCE_DIR}/include/wintun/bin/amd64/wintun.dll")
+
+# Определяем целевую директорию вывода (обычно это директория сборки)
+set(TARGET_DIRECTORY "${CMAKE_RUNTIME_OUTPUT_DIRECTORY_RELEASE}")
+
+# Создаем команду для копирования файла после компиляции
+add_custom_command(
+    TARGET ${QVPN_LIBRARY_NAME} POST_BUILD 
+    COMMAND ${CMAKE_COMMAND} -E copy_if_different
+            ${WINTUN_DLL_PATH}
+            ${TARGET_DIRECTORY}/wintun.dll
+    COMMENT "Copying wintun.dll to ${TARGET_DIRECTORY} directory"
+)
 
 
 
-
+#install(FILES ${WINTUN_DLL_PATH} DESTINATION ${TARGET_DIRECTORY})  # cmake --build . --target install - запуск

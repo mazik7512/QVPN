@@ -5,11 +5,15 @@
 #include <wintun_ext.hpp>
 
 using PcapDriver = QVPN::Core::NetDriver<QVPN::PcapExt::PcapNetDriver>;
-using WinTunDriver = QVPN::Core::NetDriver<QVPN::WinTunExt::WinTunDriver>;
+using WinTunNetDriver = QVPN::Core::NetDriver<QVPN::WinTunExt::WinTunDriver>;
 using AdapterCriteria = QVPN::PcapExt::AdapterCriteria;
 
 int main()
 {
+    WinTunNetDriver d;
+    d.create_adapter();
+    d.capture_adapter();
+    /*
     PcapDriver driver;
     auto d_list = driver.get_adapters_list();
     for (const auto& it : *d_list)
@@ -20,7 +24,7 @@ int main()
     auto a = d_list->get_default_adapter<AdapterCriteria>();
     std::cout << a->get_friendly_name() << std::endl;
     driver.capture_adapter(a->get_friendly_name());
-    
+    */
     /*
     for (size_t i = 0; i < 10; i++)
     {
@@ -38,5 +42,6 @@ int main()
     std::cout << std::bitset<sizeof(unsigned long long) * 8>(QVPN::Core::DataStructures::AdapterFlags::Ipv6Enabled) << std::endl;
     std::cout << std::bitset<sizeof(unsigned long long) * 8>(QVPN::Core::DataStructures::AdapterFlags::Ipv6ManagedAddressConfigurationSupported) << std::endl
     */
+    std::cin.get();
     return 0;
 }

@@ -14,9 +14,12 @@ namespace QVPN
 		private:
 			QVPN::Core::DataStructures::AdapterList captured_adapters_;
 			QVPN::Core::DataStructures::Adapter main_adapter_;
+			
 
 		private:
 			HMODULE wintun_;
+			WINTUN_SESSION_HANDLE session_;
+			WINTUN_ADAPTER_HANDLE adapter_;
 
 		public:
 
@@ -29,8 +32,9 @@ namespace QVPN
 
 			~WinTunDriver();
 
-			std::unique_ptr<QVPN::Core::DataStructures::Adapter> create_adapter_impl();
+			void create_adapter_impl();
 			void capture_main_adapter_impl();
+			void capture_adapter_impl();
 			void capture_adapter_impl(std::string_view adapter);
 			void capture_adapter_impl(QVPN::Core::DataStructures::Adapter& adapter);
 			void close_adapter_impl(std::unique_ptr<QVPN::Core::DataStructures::Adapter> adapter);
